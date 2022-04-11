@@ -17,38 +17,6 @@ const routes = [{
         //redirect: '/home',//不需要点导航栏的首页直接显示home页面
         component: () =>
             import ('../views/Main.vue'),
-        children: [
-            // {
-            //     path: '/home',
-            //     name: 'home',
-            //     component: () =>
-            //         import ('../views/home')
-            // },
-            // {
-            //     path: '/user',
-            //     name: 'user',
-            //     component: () =>
-            //         import ('../views/User')
-            // },
-            // {
-            //     path: '/test',
-            //     name: 'test',
-            //     component: () =>
-            //         import ('../views/test')
-            // },
-            // {
-            //     path: '/page1',
-            //     name: 'page1',
-            //     component: () =>
-            //         import ('../views/other/pageOne')
-            // },
-            // {
-            //     path: '/page2',
-            //     name: 'page2',
-            //     component: () =>
-            //         import ('../views/other/pageTwo')
-            // }
-        ]
     },
     {
         path: '/login',

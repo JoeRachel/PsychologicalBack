@@ -19,7 +19,9 @@
           <img class="user" :src="userImg" alt="" />
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人中心</el-dropdown-item>
+          <el-dropdown-item @click.native="backCenter"
+            >个人中心</el-dropdown-item
+          >
           <el-dropdown-item divided @click.native="logOut"
             >退出</el-dropdown-item
           >
@@ -41,6 +43,9 @@ export default {
   methods: {
     handleMenu() {
       this.$store.commit("collapseMenu");
+    },
+    backCenter() {
+      this.$router.push("/");
     },
     logOut() {
       this.$store.commit("clearToken");

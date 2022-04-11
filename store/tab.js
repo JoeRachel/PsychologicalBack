@@ -6,9 +6,10 @@ export default {
         tabList: [{
             path: "/",
             name: 'home',
-            label: '首页',
+            label: '管理员信息',
             icon: 'home'
         }],
+        //tabList: [{}],
         currentMenu: null,
         menu: []
     },

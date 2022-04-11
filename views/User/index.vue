@@ -1,228 +1,73 @@
 <template>
-  <div clsss='manage'>
-    <el-dialog 
-        :title="operateType ==='add' ? '新增用户':'更新用户'" 
-        :visible.sync='isShow'
-        >
-      <common-form 
-          :formLabel="operateFormLabel"
-          :form="operateForm"
-          :inline='true' 
-          ref="form"
-          ></common-form>
-      <div slot='footer' class='dialog-footer'>
-        <el-button @click="isShow = false">取消</el-button>
-        <el-button type="primary" @click="confirm">确定</el-button>
-      </div>
-    </el-dialog>
-
-    <div class="manage-header">
-      <el-button type="primary" @click="addUser">+新增</el-button>
-       <common-form 
-          :formLabel='formLabel' 
-          :form='searchForm' 
-          :inline='true' 
-          ref="form"
+  <div>
+    <span></span>
+    <br />
+    <el-table v-loading="loading" style="width: 100%" :data="tableData">
+      <el-table-column prop="id" label="ID" width="200"> </el-table-column>
+      <el-table-column prop="name" label="姓名" width="200"> </el-table-column>
+      <el-table-column prop="age" label="年龄" width="150"> </el-table-column>
+      <el-table-column prop="sex" label="性别" width="200"> </el-table-column>
+      <el-table-column prop="email" label="邮箱" width="300"> </el-table-column>
+      <el-table-column prop="message" label="留言" width="300">
+      </el-table-column>
+      <el-table-column
+        prop="selection"
+        label="选择老师"
+        width="200"
+      ></el-table-column>
+      <el-table-column fixed="right" label="操作" width="200">
+        <template slot-scope="scope">
+          <el-button type="primary" size="medium" @click="delAppoint(scope.row)"
+            >点击已阅</el-button
           >
-         <el-button type="primary" @click="getList(searchForm.keyword)">搜索</el-button>
-      </common-form>
-    </div>
-    <common-table
-        :tableData="tableData"
-        :tableLabel="tableLabel"
-        :config="config"
-        @changePage="getList()"
-        @edit="editUser"
-        @del="delUser"
-    ></common-table>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script>
-import CommonForm from'../../src/components/CommonForm.vue'
-import CommonTable from'../../src/components/CommonTable.vue'
-import { getUser } from '../../api/data'
+import request from "@/utils/request";
+export default {
+  name: "User",
+  data() {
+    return {
+      loading: false,
+      visible: false,
+      tableData: [
+        // {
+        //   date: "2016-05-02",
+        //   name: "王小虎",
+        //   address: "上海市普陀区金沙江路 1518 弄",
+        // },
+      ],
+    };
+  },
 
-export default { 
-    name:'User',
-    components:{
-      CommonForm,
-      CommonTable
+  methods: {
+    showAppoint() {
+      this.loading = true;
+      request.get("/Appoint/showAppoint").then((res) => {
+        console.log(res);
+        this.tableData = res.data;
+        this.loading = false;
+      });
     },
-    data() {
-        return {
-          operateType:'add',
-          isShow:false,
-          operateFormLabel:  [
-                    {
-                        model: 'name',
-                        label: '姓名',
-                        type: 'input'
-                    },
-                    {
-                        model: 'age',
-                        label: '年龄',
-                        type: 'input'
-                    },
-                    {
-                        model: 'sex',
-                        label: '性别',
-                        type: 'select',
-                        opts: [
-                            {
-                                label: '男',
-                                value: 1
-                            },
-                            {
-                                label: '女',
-                                value: 0
-                            }
-                        ]
-                    },
-                    {
-                        model: 'birth',
-                        label: '出生日期',
-                        type: 'date'
-                    },
-                    {
-                        model: 'addr',
-                        label: '地址',
-                        type: 'input'
-                    }
-                ],                  
-          operateForm:{
-            name:'',
-            addr:'',
-            age:'',
-            birth:'',
-            sex:''
-          },
-          formLabel:[{
-                  model:"keyword",
-                  label:'',
-                  type:'input'
-                }
-          ],
-          searchForm:{
-                    keyword:''
-          },
-          tableData:[
+    delAppoint(row) {
+      request
+        .delete("/Appoint/delAppoint", { params: { id: row.id } })
+        .then((res) => {
+          console.log(res);
 
-          ],
-          tableLabel:[
-        {
-          prop:"name",
-          label:"姓名"
-        },
-        {
-          prop:"age",
-          label:"年龄"
-        },
-        {
-          prop:"sex",
-          label:"性别"
-        },
-        {
-          prop:"birth",
-          label:"出生日期",
-          width:200
-        },
-        {
-          prop:"addr",
-          label:"地址",
-          width:320
-        },
-          ],
-          config:{
-            page:1,
-            total:30
-          },
-          
-        }
+          this.showAppoint();
+        });
     },
-    methods:{
-      confirm(){
-        if(this.operateType==='edit'){
-          this.$http.post('/user/edit',this.operateForm).then(res=>{
-            console.log(res)
-            this.isShow=false
-            this.getList()
-          })
-        } else{
-            this.$http.post('/user/add',this.operateForm).then(res=>{
-              console.log(res)
-            this.isShow=false
-            this.getList()
-          })
-        }
-      }, 
-      addUser(){
-        this.isShow=true
-        this.operateType='add'
-        this.operateForm={
-            name:'',
-            addr:'',
-            age:'',
-            birth:'',
-            sex:''
-          }
-      },
-      getList(name=''){
-        this.config.loading=true
-        name ? (this.config.page=1) : ''
-        getUser({
-          page:this.config.page,
-          name
-        }).then(res=>{
-          this.tableData=res.data.list.map(item=>{
-              item.sexLabel= item.sex ===0 ? "女": "男"
-              return item
-          })
-          this.config.total =res.count
-          this.config.loading=false
-        })
-          
-        
-      },
-      editUser(row){
-        this.operateType='edit'
-        this.isShow=true
-        this.operateForm=row
+  },
 
-      },
-      delUser(row){
-        this.$confirm("此操作将永久删除该信息,是否继续？","提示",{
-          confirmButtonText:"确认",
-          cancelButtonText:"取消",
-          type:"warning"
-        }).then(()=>{
-          const id=row.id
-          this.$http.post("/user/del",{
-            params:{id}
-          }).then(()=>{
-            this.$message({
-              type:"success",
-              message:"删除成功！"
-            })
-            this.getList()
-          })
-        })
-      },
-      
-
-
-    },
-    created() {
-      this.getList()
-    },
-}
+  created() {
+    this.showAppoint();
+  },
+};
 </script>
 
-<style lang='less'>
-.manage-header{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-</style>
+<style lang="less"></style>

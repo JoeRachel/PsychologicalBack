@@ -45,6 +45,7 @@ router.beforeEach((to, from, next) => {
 new Vue({
     store,
     router,
+    axios,
     el: '#app',
     render: h => h(App),
     created() {
